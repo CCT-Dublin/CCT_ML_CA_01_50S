@@ -181,7 +181,7 @@ class DpGraphicBar:
         )
 
         ax.set_title(
-            label       = "Distribution of cancer diagnoses",
+            label       = "Distribution of Malignant and Benign Diagnoses",
             fontsize    = 16,
             fontweight  = "bold",
             pad         = 15
