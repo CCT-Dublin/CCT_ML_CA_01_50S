@@ -163,19 +163,31 @@ class DpGraphicBar:
         plt.show()
 
 
-    def F_target_barplot(self, data:pd.DataFrame, column:str) -> None:
-        label_counts = data[column].value_counts(dropna=False)
+
+    def F_target_barplot(
+        self,
+        data: pd.DataFrame,
+        column: str,
+        target_labels: list,
+        target_names: list
+    ) -> None:
+
+        label_counts = data[column].value_counts(dropna=False).sort_index()
         label_percentages = label_counts / label_counts.sum() * 100
+
+        # Map target labels to their respective names
+        label_mapping = dict(zip(target_labels, target_names))
+        x_labels = [label_mapping.get(value, str(value)) for value in label_counts.index]
 
         sns.set_theme(style="whitegrid", context="notebook")
 
         fig, ax = plt.subplots(figsize=(14, 6))
 
         sns.barplot(
-            x       = label_counts.index.astype(str),
+            x       = x_labels,
             y       = label_counts.values,
-            hue     = label_counts.index.astype(str),
-            palette = "Blues_r",
+            hue     = x_labels,
+            palette = "ch:s=.25,rot=-.25",
             legend  = False,
             ax      = ax
         )
@@ -188,14 +200,14 @@ class DpGraphicBar:
         )
 
         ax.text(
-            x                   = 0.85,
+            x                   = 0.98,
             y                   = 0.95,
             s                   = f"Total Label Cancer Diagnoses: {label_counts.sum():,}",
             transform           = ax.transAxes,
             fontsize            = 12,
             fontweight          = "bold",
             verticalalignment   = "top",
-            horizontalalignment = "left",
+            horizontalalignment = "right",
             bbox = dict(
                 boxstyle    = "round,pad=0.5",
                 facecolor   = "white",
@@ -204,8 +216,8 @@ class DpGraphicBar:
             )
         )
 
-        ax.set_xlabel("Cancer Diagnoses Outcome", fontsize = 12, labelpad = 10)
-        ax.set_ylabel("Number of Diagnoses", fontsize = 12, labelpad = 10)
+        ax.set_xlabel("Cancer Diagnoses Outcome", fontsize=12, labelpad=10)
+        ax.set_ylabel("Number of Diagnoses", fontsize=12, labelpad=10)
 
         for i, (count, percentage) in enumerate(
             zip(label_counts.values, label_percentages.values)
@@ -220,8 +232,8 @@ class DpGraphicBar:
                 fontweight  = "bold"
             )
 
-        ax.grid(axis = "y", linestyle = "--", alpha = 0.4)
-        ax.grid(axis = "x", visible = False)
+        ax.grid(axis="y", linestyle="--", alpha=0.4)
+        ax.grid(axis="x", visible=False)
 
         sns.despine()
 

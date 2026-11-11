@@ -26,15 +26,15 @@ class DpGraphicHelpful:
         match _type:
             case 1:
                 correlation_matrix = data[column_list].corr(method = "pearson")
-                plt.figure(figsize = (12, 10))
+                plt.figure(figsize = (22, 18))
             case 2:
                 correlation_matrix = data.select_dtypes(include=['float64', 'int64']).corr()
-                plt.figure(figsize = (22, 22))
+                plt.figure(figsize = (22, 18))
             case _:
                 return
 
         sns.heatmap(correlation_matrix, annot = True, fmt = '.2f', cmap = 'coolwarm', square = True, cbar_kws = {"shrink": .8})
-        plt.title('Heatmap of Correlation Matrix for Bitcoin Heist Ransomware Address')
+        plt.title('Heatmap of Correlation Matrix for Breast Cancer Wisconsin')
         plt.show()
 
     def F_plot_pca(self, cumulative_data:np.ndarray, n_components:int) -> None:
