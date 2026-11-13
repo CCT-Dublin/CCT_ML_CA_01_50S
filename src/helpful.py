@@ -147,7 +147,7 @@ class DpGraphicHelpful:
             ax.set_ylabel("Actual Label", fontsize = 11)
 
         fig.suptitle(
-            "KNN Confusion Matrix Comparison",
+            "Confusion Matrix Comparison",
             fontsize    = 16,
             fontweight  = "bold"
         )
