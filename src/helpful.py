@@ -155,84 +155,109 @@ class DpGraphicHelpful:
         plt.tight_layout()
         plt.show()
 
-    def F_comparison_plot(self, data: pd.DataFrame, metrics: list = [
-            "Accuracy",
-            "Macro Precision",
-            "Macro Recall",
-            "Macro F1-score",
-            "Weighted F1-score"
-        ]) -> None:
 
-        metrics = metrics
 
-        fig, ax = plt.subplots(figsize=(14, 7))
+    def F_comparison_plot(self, data: pd.DataFrame) -> None:
 
-        df_plot = (
-            data
-            .set_index("Model")[metrics]
-            .mul(100)
+        metrics = ["CV Mean", "Test Accuracy"]
+
+        model_order = data["Model"].unique()
+        test_size_order = ["5%", "15%", "25%"]
+
+        sns.set_theme(style="whitegrid", context="notebook")
+
+        # Convert evaluation scores to percentage
+        df_plot = data.copy()
+        df_plot[metrics] = df_plot[metrics].mul(100)
+
+        fig, axes = plt.subplots(
+            nrows   = 1,
+            ncols   = 2,
+            figsize = (16, 7)
         )
 
-        df_plot.plot(
-            kind        = "bar",
-            ax          = ax,
-            width       = 0.8,
-            edgecolor   = "white",
-            linewidth   = 0.8,
-            alpha       = 0.9
-        )
+        for ax, metric in zip(axes, metrics):
 
-        for container in ax.containers:
-
-            ax.bar_label(
-                container   = container,
-                fmt         = "%.2f%%",
-                fontsize    = 8,
-                padding     = 3,
-                rotation    = 90
+            sns.barplot(
+                data        = df_plot,
+                x           = "Test Size",
+                y           = metric,
+                hue         = "Model",
+                order       = test_size_order,
+                hue_order   = model_order,
+                palette     = "Set2",
+                edgecolor   = "white",
+                linewidth   = 0.8,
+                ax          = ax
             )
 
-        ax.set_title(
-            label       = "Classification Model Performance Comparison",
-            fontsize    = 16,
-            fontweight  = "bold",
-            pad         = 18
-        )
+            # Bar labels
+            for container in ax.containers:
 
-        ax.set_xlabel("Classification Models", fontsize=11, labelpad=10)
-        ax.set_ylabel("Evaluation Score (%)", fontsize=11, labelpad=10)
+                ax.bar_label(
+                    container   = container,
+                    fmt         = "%.2f%%",
+                    fontsize    = 9,
+                    fontweight  = "bold",
+                    padding     = 3
+                )
 
-        ax.set_ylim(0, 112)
+            ax.set_title(
+                label       = metric,
+                fontsize    = 14,
+                fontweight  = "bold",
+                pad         = 12
+            )
 
-        ax.legend(
-            title           = "Evaluation Metrics",
-            fontsize        = 9,
-            title_fontsize  = 10,
+            ax.set_xlabel("Test Size", fontsize=11, labelpad=10)
+            ax.set_ylabel("Evaluation Score (%)", fontsize=11, labelpad=10)
+
+            ax.set_ylim(0, 110)
+
+            ax.yaxis.set_major_formatter(
+                plt.FuncFormatter(lambda x, _: f"{x:.0f}%")
+            )
+
+            ax.grid(
+                axis        = "y",
+                linestyle   = "--",
+                alpha       = 0.3
+            )
+
+            ax.grid(axis="x", visible=False)
+
+            ax.set_axisbelow(True)
+            ax.tick_params(axis="both", labelsize=9)
+
+            sns.despine(ax=ax)
+
+            # Remove individual legends
+            ax.get_legend().remove()
+
+        # Shared legend
+        handles, labels = axes[0].get_legend_handles_labels()
+
+        fig.legend(
+            handles,
+            labels,
+            title           = "Classification Model",
             loc             = "lower center",
-            bbox_to_anchor  = (0.5, -0.25),
-            ncol            = 3,
+            bbox_to_anchor  = (0.5, 0.015),
+            ncol            = 2,
+            fontsize        = 10,
+            title_fontsize  = 10,
             frameon         = False
         )
 
-        ax.grid(
-            axis        ="y",
-            linestyle   = "--",
-            alpha       = 0.3
-        )
-        ax.grid(
-            axis    = "x",
-            visible = False
+        fig.suptitle(
+            "Classification Model Performance Comparison",
+            fontsize    = 17,
+            fontweight  = "bold",
+            y           = 0.98
         )
 
-        ax.set_axisbelow(True)
+        # Reserve space for title and shared legend
+        fig.tight_layout(rect=[0, 0.12, 1, 0.93])
 
-        ax.tick_params(axis="x", rotation=0, labelsize=10)
-        ax.tick_params(axis="y", labelsize=9)
-
-        sns.despine(ax=ax)
-
-        plt.tight_layout()
         plt.show()
-
-
 
