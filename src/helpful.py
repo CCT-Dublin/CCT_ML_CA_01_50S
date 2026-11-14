@@ -156,24 +156,104 @@ class DpGraphicHelpful:
         plt.show()
 
 
+    def F_confusion_matrix_v1(
+            self,
+            results: list,
+            labels: list = [0, 1],
+            class_names: list = ["Benign", "Malignant"],
+    ) -> None:
+
+        models = ["Random Forest", "KNeighborsClassifier"]
+        test_sizes = ["5%", "15%", "25%"]
+
+        fig, axes = plt.subplots(
+            nrows   = 2,
+            ncols   = 3,
+            figsize = (15, 9)
+        )
+
+        for row, model in enumerate(models):
+
+            for col, test_size in enumerate(test_sizes):
+
+                ax = axes[row, col]
+
+                result = next(
+                    (
+                        item for item in results
+                        if item["Model"] == model
+                        and item["Test Size"] == test_size
+                    ),
+                    None
+                )
+
+                if result is None:
+                    ax.set_visible(False)
+                    continue
+
+                cm = confusion_matrix(
+                    y_true  = result["y_true"],
+                    y_pred  = result["y_pred"],
+                    labels  = labels
+                )
+
+                sns.heatmap(
+                    data        = cm,
+                    annot       = True,
+                    fmt         = "d",
+                    cmap        = "Blues",
+                    linewidths  = 0.5,
+                    cbar        = False,
+                    xticklabels = class_names,
+                    yticklabels = class_names,
+                    annot_kws   = {"size": 12, "weight": "bold"},
+                    ax          = ax
+                )
+
+                ax.set_title(
+                    f"{model} - Test Size: {test_size}",
+                    fontsize    = 11,
+                    fontweight  = "bold",
+                    pad         = 10
+                )
+
+                ax.set_xlabel("Predicted Label", fontsize=10)
+                ax.set_ylabel("Actual Label", fontsize=10)
+
+        fig.suptitle(
+            t           = "Confusion Matrix Comparison",
+            fontsize    = 17,
+            fontweight  = "bold",
+            y           = 1.02
+        )
+
+        fig.tight_layout()
+
+        plt.show()
+
 
     def F_comparison_plot(self, data: pd.DataFrame) -> None:
 
-        metrics = ["CV Mean", "Test Accuracy"]
+        metrics = ["CV Mean", "Test Accuracy", "recall Score"]
+
+        metric_titles = {
+            "CV Mean": "Cross-Validation Mean",
+            "Test Accuracy": "Test Accuracy",
+            "recall Score": "Malignant Recall"
+        }
 
         model_order = data["Model"].unique()
         test_size_order = ["5%", "15%", "25%"]
 
         sns.set_theme(style="whitegrid", context="notebook")
 
-        # Convert evaluation scores to percentage
         df_plot = data.copy()
         df_plot[metrics] = df_plot[metrics].mul(100)
 
         fig, axes = plt.subplots(
             nrows   = 1,
-            ncols   = 2,
-            figsize = (16, 7)
+            ncols   = 3,
+            figsize = (20, 7)
         )
 
         for ax, metric in zip(axes, metrics):
@@ -203,7 +283,7 @@ class DpGraphicHelpful:
                 )
 
             ax.set_title(
-                label       = metric,
+                label       = metric_titles[metric],
                 fontsize    = 14,
                 fontweight  = "bold",
                 pad         = 12
@@ -231,33 +311,29 @@ class DpGraphicHelpful:
 
             sns.despine(ax=ax)
 
-            # Remove individual legends
             ax.get_legend().remove()
 
-        # Shared legend
         handles, labels = axes[0].get_legend_handles_labels()
 
         fig.legend(
             handles,
             labels,
-            title           = "Classification Model",
-            loc             = "lower center",
-            bbox_to_anchor  = (0.5, 0.015),
-            ncol            = 2,
-            fontsize        = 10,
-            title_fontsize  = 10,
-            frameon         = False
+            title="Classification Model",
+            loc="lower center",
+            bbox_to_anchor=(0.5, 0.015),
+            ncol=2,
+            fontsize=10,
+            title_fontsize=10,
+            frameon=False
         )
 
         fig.suptitle(
-            "Classification Model Performance Comparison",
+            t           = "Classification Model Performance Comparison",
             fontsize    = 17,
             fontweight  = "bold",
             y           = 0.98
         )
 
-        # Reserve space for title and shared legend
         fig.tight_layout(rect=[0, 0.12, 1, 0.93])
 
         plt.show()
-
