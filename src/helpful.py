@@ -271,7 +271,6 @@ class DpGraphicHelpful:
                 ax          = ax
             )
 
-            # Bar labels
             for container in ax.containers:
 
                 ax.bar_label(
@@ -318,13 +317,13 @@ class DpGraphicHelpful:
         fig.legend(
             handles,
             labels,
-            title="Classification Model",
-            loc="lower center",
-            bbox_to_anchor=(0.5, 0.015),
-            ncol=2,
-            fontsize=10,
-            title_fontsize=10,
-            frameon=False
+            title           = "Classification Model",
+            loc             = "lower center",
+            bbox_to_anchor  = (0.5, 0.015),
+            ncol            = 2,
+            fontsize        = 10,
+            title_fontsize  = 10,
+            frameon         = False
         )
 
         fig.suptitle(
@@ -335,5 +334,121 @@ class DpGraphicHelpful:
         )
 
         fig.tight_layout(rect=[0, 0.12, 1, 0.93])
+
+        plt.show()
+
+
+    def F_comparison_plot_v1(self, data: pd.DataFrame) -> None:
+
+        metrics = [
+            "Training Accuracy",
+            "CV Mean",
+            "Test Accuracy"
+        ]
+
+        metric_titles = {
+            "Training Accuracy": "Training Accuracy",
+            "CV Mean": "Cross-Validation Mean",
+            "Test Accuracy": "Test Accuracy"
+        }
+
+        model_order = data["Model"].unique()
+
+        sns.set_theme(style="whitegrid", context="notebook")
+
+        df_plot = data.copy()
+        df_plot[metrics] = df_plot[metrics].mul(100)
+
+        df_plot = df_plot.melt(
+            id_vars     = ["Model"],
+            value_vars  = metrics,
+            var_name    = "Evaluation",
+            value_name  = "Score"
+        )
+
+        evaluation_order = metrics
+
+        fig, ax = plt.subplots(
+            figsize=(12, 7)
+        )
+
+        sns.barplot(
+            data        = df_plot,
+            x           = "Evaluation",
+            y           = "Score",
+            hue         = "Model",
+            order       = evaluation_order,
+            hue_order   = model_order,
+            palette     = "Set2",
+            edgecolor   = "white",
+            linewidth   = 0.8,
+            ax          = ax
+        )
+
+        for container in ax.containers:
+
+            ax.bar_label(
+                container   = container,
+                fmt         = "%.2f%%",
+                fontsize    = 0,
+                fontweight  = "bold",
+                padding     = 3
+            )
+
+        ax.set_title(
+            "Training, Cross-Validation and Test Accuracy",
+            fontsize=16,
+            fontweight="bold",
+            pad=15
+        )
+
+        ax.set_xlabel("Evaluation Stage", fontsize=11, labelpad=10)
+        ax.set_ylabel("Accuracy Score (%)", fontsize=11, labelpad=10)
+
+        ax.set_ylim(0, 110)
+
+        ax.set_xticklabels([
+            "Training",
+            "Cross-Validation",
+            "Test"
+        ])
+
+        ax.yaxis.set_major_formatter(
+            plt.FuncFormatter(lambda x, _: f"{x:.0f}%")
+        )
+
+        ax.grid(
+            axis            ="y",
+            linestyle    = "--",
+            alpha        = 0.3
+        )
+
+        ax.grid(
+            axis        = "x",
+            visible     = False
+        )
+
+        ax.set_axisbelow(True)
+        ax.tick_params(axis="both", labelsize=10)
+
+        sns.despine(ax=ax)
+
+        ax.legend_.remove()
+
+        handles, labels = ax.get_legend_handles_labels()
+
+        fig.legend(
+            handles,
+            labels,
+            title           = "Classification Model",
+            loc             = "lower center",
+            bbox_to_anchor  = (0.5, 0.015),
+            ncol            = 2,
+            fontsize        = 10,
+            title_fontsize  = 10,
+            frameon         = False
+        )
+
+        fig.tight_layout(rect=[0, 0.10, 1, 1])
 
         plt.show()
