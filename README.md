@@ -92,7 +92,7 @@ cd CCT_ML_CA_01_50S
 
 ### 2. Create a virtual environment
 
-**macOS / Linux**
+**macOS / Linux / Windows**
 ```bash
 conda create -n $(basename $(pwd)) python=3.14.10
 ```
