@@ -390,7 +390,7 @@ class DpGraphicHelpful:
             ax.bar_label(
                 container   = container,
                 fmt         = "%.2f%%",
-                fontsize    = 0,
+                fontsize    = 9,
                 fontweight  = "bold",
                 padding     = 3
             )
@@ -406,6 +406,8 @@ class DpGraphicHelpful:
         ax.set_ylabel("Accuracy Score (%)", fontsize=11, labelpad=10)
 
         ax.set_ylim(0, 110)
+
+        ax.set_xticks(range(len(evaluation_order)))
 
         ax.set_xticklabels([
             "Training",

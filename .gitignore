@@ -204,4 +204,4 @@ tests-result.xml
 
 
 *.DS_Store
-/data/*
+# /data/*
